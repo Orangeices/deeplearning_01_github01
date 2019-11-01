@@ -54,7 +54,6 @@ with tf.Session() as sess:
         print(l, acc)
     print("".join([idx2char[c] for c in sess.run(predicted, feed_dict={X:x_data})[0]]))
 
-
 '''
 
 
