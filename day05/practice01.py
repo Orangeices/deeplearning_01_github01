@@ -45,17 +45,20 @@ tf.summary.scalar('cost', cost)
 tf.summary.histogram('w', w)
 merge = tf.summary.merge_all()
 # 保存
-saver = tf.train.Saver()
+saver = tf.train.Saver(max_to_keep=5)
 
 
 # session
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     fileWriter = tf.summary.FileWriter('./log', graph=sess.graph)
-    for i in range(1001):
-        cost_val, _, acc, summary = sess.run([cost, train, accuracy, merge], feed_dict={X:x_data, Y:y_data})
-        fileWriter.add_summary(summary, i)
-        if i%100 == 0:
-            print(cost_val, acc)
-    saver.save(sess, './saved/m1') # 具体到文件名
+    # for i in range(1001):
+    #     cost_val, _, acc, summary = sess.run([cost, train, accuracy, merge], feed_dict={X:x_data, Y:y_data})
+    #     fileWriter.add_summary(summary, i)
+    #     if i%100 == 0:
+    #         print(cost_val, acc)
+    #         saver.save(sess, './saved/m1')  # 具体到文件名
+    saver.restore(sess, './saved/m1')
+    cost_val, _, acc, summary = sess.run([cost, train, accuracy, merge], feed_dict={X: x_data, Y: y_data})
+    print(cost_val, acc)
     fileWriter.close()
