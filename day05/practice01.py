@@ -31,15 +31,15 @@ Y = tf.placeholder(tf.float32, [None, 3])
 w = tf.Variable(tf.random_normal([4, 3]),name='w')
 b = tf.Variable(tf.random_normal([3]),name='b')
 # hypothesis
-hypothesis = tf.nn.softmax(tf.matmul(X, w) + b)
+hypothesis = tf.nn.softmax(tf.matmul(X, w) + b, name='h')
 # cost
 cost = tf.reduce_mean(-tf.reduce_sum(Y*tf.log(hypothesis), axis=1))
 # train
 train = tf.train.GradientDescentOptimizer(learning_rate=0.1).minimize(cost)
 # accuracy
-prediction = tf.argmax(hypothesis, 1)
-correct_pred = tf.equal(prediction, tf.argmax(y_data, 1))
-accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+prediction = tf.argmax(hypothesis, 1, name='prediction')
+correct_pred = tf.equal(prediction, tf.argmax(y_data, 1), name='correct_pred')
+accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32), name='accuracy')
 # 收集， 合并
 tf.summary.scalar('cost', cost)
 tf.summary.histogram('w', w)
@@ -52,13 +52,13 @@ saver = tf.train.Saver(max_to_keep=5)
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     fileWriter = tf.summary.FileWriter('./log', graph=sess.graph)
-    # for i in range(1001):
-    #     cost_val, _, acc, summary = sess.run([cost, train, accuracy, merge], feed_dict={X:x_data, Y:y_data})
-    #     fileWriter.add_summary(summary, i)
-    #     if i%100 == 0:
-    #         print(cost_val, acc)
-    #         saver.save(sess, './saved/m1')  # 具体到文件名
-    saver.restore(sess, './saved/m1')
+    for i in range(1001):
+        cost_val, _, acc, summary = sess.run([cost, train, accuracy, merge], feed_dict={X:x_data, Y:y_data})
+        fileWriter.add_summary(summary, i)
+        if i%100 == 0:
+            print(cost_val, acc)
+            saver.save(sess, './saved/m1')  # 具体到文件名
+    # saver.restore(sess, './saved/m1')
     cost_val, _, acc, summary = sess.run([cost, train, accuracy, merge], feed_dict={X: x_data, Y: y_data})
     print(cost_val, acc)
     fileWriter.close()
